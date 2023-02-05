@@ -1,6 +1,15 @@
-import { Competition, CompetitionTeamsMap, CompetitionToImport, Team } from '../../types';
+import {
+  Competition,
+  CompetitionMatchesMap,
+  CompetitionTeamsMap,
+  CompetitionToImport,
+  Match,
+  MatchResult,
+  Team,
+} from '../../types';
 import { PrismaClient } from '@prisma/client';
 import uniqBy from 'lodash/uniqBy';
+import { DateTime } from 'luxon';
 
 export function transformCompetitions(competitions: CompetitionToImport[]): Competition[] {
   return competitions.map(({ name }) => ({
@@ -26,4 +35,56 @@ export async function transformTeams(prisma: PrismaClient, competitionTeams: Com
     teams = [...teams, ...uniqueCompetitionTeams];
   }
   return teams;
+}
+
+export async function transformMatches(
+  prisma: PrismaClient,
+  competitionMatchesMap: CompetitionMatchesMap,
+): Promise<Match[]> {
+  const competitionNames: string[] = Object.keys(competitionMatchesMap);
+  let matches: Match[] = [];
+  for (const competitionName of competitionNames) {
+    const competition = (await prisma.competition.findFirst({
+      where: {
+        name: {
+          equals: competitionName,
+        },
+      },
+    })) as Competition;
+    const competitionTeams = await prisma.team.findMany({
+      where: {
+        competitions: {
+          some: {
+            competition: {
+              name: competitionName,
+            },
+          },
+        },
+      },
+    });
+    const competitionMatches = competitionMatchesMap[competitionName];
+    const transformedMatches: Match[] = competitionMatches.map(
+      ({ date, teamAwayScore, teamHomeScore, teamNameAway, teamNameHome }) => {
+        let result = MatchResult.Draw;
+        if (teamHomeScore > teamAwayScore) {
+          result = MatchResult.HomeWin;
+        } else if (teamAwayScore > teamHomeScore) {
+          result = MatchResult.AwayWin;
+        }
+        const awayTeam: Team = competitionTeams.find((team) => team.name === teamNameAway) as Team;
+        const homeTeam: Team = competitionTeams.find((team) => team.name === teamNameHome) as Team;
+        return {
+          awayTeam,
+          awayTeamGoals: Number(teamAwayScore),
+          competition,
+          date: DateTime.fromFormat(date, 'dd/MM/yyyy').toJSDate(),
+          homeTeam,
+          homeTeamGoals: Number(teamHomeScore),
+          result,
+        };
+      },
+    );
+    matches = [...matches, ...transformedMatches];
+  }
+  return matches;
 }

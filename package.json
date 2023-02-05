@@ -22,6 +22,7 @@
     "eslint-config-next": "13.1.6",
     "eslint-plugin-prettier": "^4.2.1",
     "lodash": "^4.17.21",
+    "luxon": "^3.2.1",
     "next": "13.1.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
+    "@types/luxon": "^3.2.0",
     "csv-parse": "^5.3.4",
     "eslint-config-prettier": "^8.6.0",
     "prettier": "^2.8.3",

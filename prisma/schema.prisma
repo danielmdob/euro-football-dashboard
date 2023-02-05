@@ -14,12 +14,15 @@ model Competition {
   id    Int     @id @default(autoincrement())
   name  String?
   teams TeamsOnCompetitions[]
+  matches Match[]
 }
 
 model Team {
   id    Int     @id @default(autoincrement())
   name  String?
   competitions TeamsOnCompetitions[]
+  homeMatches Match[] @relation(name: "homeTeam")
+  awayMatches Match[] @relation(name: "awayTeam")
 }
 
 model TeamsOnCompetitions {
@@ -29,4 +32,18 @@ model TeamsOnCompetitions {
   competitionId Int
 
   @@id([teamId, competitionId])
+}
+
+model Match {
+  id    Int     @id @default(autoincrement())
+  homeTeam      Team    @relation(name: "homeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId    Int
+  awayTeam      Team    @relation(name: "awayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId    Int
+  date          DateTime
+  homeTeamGoals Int
+  awayTeamGoals Int
+  result        String
+  competition   Competition  @relation(fields: [competitionId], references: [id])
+  competitionId Int
 }

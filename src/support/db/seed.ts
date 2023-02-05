@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { loadCompetitions, loadTeams } from './load';
-import { extractCompetitions, extractTeams } from './extract';
-import { transformCompetitions, transformTeams } from './transform';
-import { CompetitionTeamsMap } from '@/types';
+import { loadCompetitions, loadMatches, loadTeams } from './load';
+import { extractCompetitions, extractMatches, extractTeams } from './extract';
+import { transformCompetitions, transformMatches, transformTeams } from './transform';
+import { CompetitionMatchesMap, CompetitionTeamsMap, Match } from '@/types';
 
 const prisma = new PrismaClient();
 
@@ -18,9 +18,17 @@ async function importTeams() {
   await loadTeams(prisma, transformedTeams);
 }
 
+async function importMatches() {
+  const competitionMatches: CompetitionMatchesMap = extractMatches();
+  const transformedMatches: Match[] = await transformMatches(prisma, competitionMatches);
+  console.log(transformedMatches);
+  await loadMatches(prisma, transformedMatches);
+}
+
 async function main() {
   await importCompetitions();
   await importTeams();
+  await importMatches();
 }
 
 main()

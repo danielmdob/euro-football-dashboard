@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Competition, Team } from '../../types';
+import { Competition, Match, Team } from '../../types';
 
 export async function loadCompetitions(prisma: PrismaClient, competitions: Competition[]) {
   await prisma.competition.createMany({
@@ -26,4 +26,17 @@ export async function loadTeams(prisma: PrismaClient, teams: Team[]) {
       }),
     ),
   );
+}
+export async function loadMatches(prisma: PrismaClient, matches: Match[]) {
+  await prisma.match.createMany({
+    data: matches.map((match) => ({
+      awayTeamGoals: match.awayTeamGoals,
+      awayTeamId: match.awayTeam.id as number,
+      competitionId: match.competition.id as number,
+      date: match.date,
+      homeTeamGoals: match.awayTeamGoals,
+      homeTeamId: match.homeTeam.id as number,
+      result: match.result,
+    })),
+  });
 }

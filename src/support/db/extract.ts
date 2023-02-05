@@ -1,10 +1,9 @@
-import uniq from 'lodash/uniq';
 import { parse } from 'csv-parse/sync';
 import fs from 'fs';
 import { INTERNATIONAL_COMPETITIONS, NATIONAL_COMPETITIONS } from './data';
-import { CompetitionTeamsMap, CompetitionToImport, Team } from '../../types';
+import { CompetitionMatchesMap, CompetitionTeamsMap, CompetitionToImport, Match, Team } from '../../types';
 
-const TEAM_COLUMNS = [
+const MATCH_COLUMNS = [
   'matchId',
   'stage',
   'date',
@@ -12,15 +11,22 @@ const TEAM_COLUMNS = [
   'penaltiesHomeScore',
   'penaltiesAwayScore',
   'teamNameHome',
+  'teamNameAway',
+  'teamHomeScore',
+  'teamAwayScore',
 ];
 
 const DATA_PATH = 'data';
+
+export function extractCompetitions(): CompetitionToImport[] {
+  return [...NATIONAL_COMPETITIONS, ...INTERNATIONAL_COMPETITIONS];
+}
 
 export function extractTeams(): CompetitionTeamsMap {
   return NATIONAL_COMPETITIONS.reduce((acc, current) => {
     const buffer = fs.readFileSync(`${DATA_PATH}/${current.dataSheet}`);
     const matches = parse(buffer, {
-      columns: TEAM_COLUMNS,
+      columns: MATCH_COLUMNS,
       relaxColumnCount: true,
       fromLine: 2,
     });
@@ -29,6 +35,15 @@ export function extractTeams(): CompetitionTeamsMap {
   }, {});
 }
 
-export function extractCompetitions(): CompetitionToImport[] {
-  return [...NATIONAL_COMPETITIONS, ...INTERNATIONAL_COMPETITIONS];
+export function extractMatches(): CompetitionMatchesMap {
+  return NATIONAL_COMPETITIONS.reduce((acc, current) => {
+    const buffer = fs.readFileSync(`${DATA_PATH}/${current.dataSheet}`);
+    const matches = parse(buffer, {
+      columns: MATCH_COLUMNS,
+      relaxColumnCount: true,
+      fromLine: 2,
+    });
+
+    return { ...acc, [current.name]: matches };
+  }, {});
 }
