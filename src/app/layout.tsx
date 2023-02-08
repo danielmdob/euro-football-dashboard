@@ -1,10 +1,12 @@
-import './globals.css'
+import './globals.css';
+import { PrismaClient } from '@prisma/client';
+import Link from 'next/link';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+const client = new PrismaClient();
+
+export default async function RootLayout({ children, params }: { children: React.ReactNode; params: any }) {
+  console.log('params', params);
+  const competitions = await client.competition.findMany();
   return (
     <html lang="en">
       {/*
@@ -12,7 +14,18 @@ export default function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
-      <body>{children}</body>
+      <body>
+        <header>
+          <ul className="flex font-semibold">
+            {competitions.map((competition) => (
+              <li className="p-6" key={competition.id}>
+                <Link href={`competitions/${competition.id}`}>{competition.name}</Link>
+              </li>
+            ))}
+          </ul>
+        </header>
+        {children}
+      </body>
     </html>
-  )
+  );
 }

@@ -30,7 +30,7 @@ export async function loadTeams(prisma: PrismaClient, teams: Team[]) {
 export async function loadMatches(prisma: PrismaClient, matches: Match[]) {
   await prisma.match.createMany({
     data: matches.map((match) => ({
-      awayTeamGoals: match.awayTeamGoals,
+      awayTeamGoals: match.homeTeamGoals,
       awayTeamId: match.awayTeam.id as number,
       competitionId: match.competition.id as number,
       date: match.date,

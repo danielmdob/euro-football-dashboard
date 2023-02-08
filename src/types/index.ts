@@ -51,3 +51,6 @@ export interface MatchToImport {
   teamHomeScore: string;
   teamAwayScore: string;
 }
+export interface PageParams {
+  id: number;
+}
