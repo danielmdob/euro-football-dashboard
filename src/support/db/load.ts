@@ -9,32 +9,28 @@ export async function loadCompetitions(prisma: PrismaClient, competitions: Compe
 
 export async function loadTeams(prisma: PrismaClient, teams: Team[]) {
   await Promise.all(
-    teams.map((team) =>
-      prisma.team.create({
+    teams.map((team) => {
+      return prisma.team.create({
         data: {
           name: team.name,
           competitions: {
-            create: {
-              competition: {
-                connect: {
-                  id: team.competitions && team.competitions[0].id,
-                },
-              },
+            createMany: {
+              data: team.competitions?.map((competition) => ({ competitionId: competition.id as number })) || [],
             },
           },
         },
-      }),
-    ),
+      });
+    }),
   );
 }
 export async function loadMatches(prisma: PrismaClient, matches: Match[]) {
   await prisma.match.createMany({
     data: matches.map((match) => ({
-      awayTeamGoals: match.homeTeamGoals,
+      awayTeamGoals: match.awayTeamGoals,
       awayTeamId: match.awayTeam.id as number,
       competitionId: match.competition.id as number,
       date: match.date,
-      homeTeamGoals: match.awayTeamGoals,
+      homeTeamGoals: match.homeTeamGoals,
       homeTeamId: match.homeTeam.id as number,
       result: match.result,
     })),

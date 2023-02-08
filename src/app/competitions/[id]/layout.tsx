@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { PageParams } from '../../../types';
+import Link from 'next/link';
 
 const client = new PrismaClient();
 
@@ -16,11 +17,11 @@ export default async function Layout({ children, params }: { children: React.Rea
 
   return (
     <div className="flex">
-      <aside className="flex flex-col">
+      <aside className="flex flex-col border-r">
         {teams.map((team) => (
-          <div className="p-4" key={team.id}>
+          <Link className="p-4 font-semibold" href={`/teams/${team.id}`} key={team.id}>
             {team.name}
-          </div>
+          </Link>
         ))}
       </aside>
       {children}

@@ -16,9 +16,8 @@ export default async function Competition({ params }: { params: PageParams }) {
       date: 'desc',
     },
   });
-  console.log(matches);
   return (
-    <div className="flex flex-col space-y-6 items-center w-full">
+    <div className="flex flex-col space-y-6 items-center w-full mt-4">
       {matches.map((match) => (
         <MatchDisplay key={match.id} match={match} />
       ))}

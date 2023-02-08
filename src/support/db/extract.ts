@@ -23,7 +23,7 @@ export function extractCompetitions(): CompetitionToImport[] {
 }
 
 export function extractTeams(): CompetitionTeamsMap {
-  return NATIONAL_COMPETITIONS.reduce((acc, current) => {
+  return extractCompetitions().reduce((acc, current) => {
     const buffer = fs.readFileSync(`${DATA_PATH}/${current.dataSheet}`);
     const matches = parse(buffer, {
       columns: MATCH_COLUMNS,
@@ -36,7 +36,7 @@ export function extractTeams(): CompetitionTeamsMap {
 }
 
 export function extractMatches(): CompetitionMatchesMap {
-  return NATIONAL_COMPETITIONS.reduce((acc, current) => {
+  return extractCompetitions().reduce((acc, current) => {
     const buffer = fs.readFileSync(`${DATA_PATH}/${current.dataSheet}`);
     const matches = parse(buffer, {
       columns: MATCH_COLUMNS,

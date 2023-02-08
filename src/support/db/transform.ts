@@ -21,18 +21,23 @@ export async function transformTeams(prisma: PrismaClient, competitionTeams: Com
   const competitionNames: string[] = Object.keys(competitionTeams);
   let teams: Team[] = [];
   for (const competitionName of competitionNames) {
-    const competition = await prisma.competition.findFirst({
+    const competition = (await prisma.competition.findFirst({
       where: {
         name: {
           equals: competitionName,
         },
       },
-    });
+    })) as Competition;
     const uniqueCompetitionTeams: Team[] = uniqBy(competitionTeams[competitionName], 'name');
     for (let team of uniqueCompetitionTeams) {
-      team.competitions = [competition as Competition];
+      const existingTeam = teams.find((existingTeam) => existingTeam.name === team.name);
+      if (existingTeam == null) {
+        team.competitions = [competition];
+        teams.push(team);
+      } else {
+        existingTeam.competitions?.push(competition);
+      }
     }
-    teams = [...teams, ...uniqueCompetitionTeams];
   }
   return teams;
 }

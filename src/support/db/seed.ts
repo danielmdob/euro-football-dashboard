@@ -21,7 +21,6 @@ async function importTeams() {
 async function importMatches() {
   const competitionMatches: CompetitionMatchesMap = extractMatches();
   const transformedMatches: Match[] = await transformMatches(prisma, competitionMatches);
-  console.log(transformedMatches);
   await loadMatches(prisma, transformedMatches);
 }
 

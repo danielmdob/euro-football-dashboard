@@ -5,7 +5,6 @@ import Link from 'next/link';
 const client = new PrismaClient();
 
 export default async function RootLayout({ children, params }: { children: React.ReactNode; params: any }) {
-  console.log('params', params);
   const competitions = await client.competition.findMany();
   return (
     <html lang="en">
@@ -16,11 +15,11 @@ export default async function RootLayout({ children, params }: { children: React
       <head />
       <body>
         <header>
-          <ul className="flex font-semibold">
+          <ul className="flex font-semibold text-lg border-b">
             {competitions.map((competition) => (
-              <li className="p-6" key={competition.id}>
-                <Link href={`competitions/${competition.id}`}>{competition.name}</Link>
-              </li>
+              <Link className="p-6" key={competition.id} href={`competitions/${competition.id}`}>
+                {competition.name}
+              </Link>
             ))}
           </ul>
         </header>
